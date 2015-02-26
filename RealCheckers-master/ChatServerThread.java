@@ -11,6 +11,7 @@ public class ChatServerThread extends Thread{
 	private  boolean running = true;
 	public volatile int opponentID = -1;
 	public volatile String username = null;
+	public volatile User user = null;
    
 
    public ChatServerThread(ChatServer _server, Socket _socket){
