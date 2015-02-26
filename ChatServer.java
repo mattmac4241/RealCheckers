@@ -59,15 +59,21 @@ public class ChatServer implements Runnable{
 	   ChatServerThread client = clients[findClient(ID)];
 	   int opponent = client.opponentID;
 	   if (input.equals(".bye")){
+		   if(client.user != null)
+			   openClients--;
 		   client.send(".bye");
 		   if(opponent != -1){
 			   clients[findClient(opponent)].send("Game Ended");
 			   clients[findClient(opponent)].opponentID = -1;
+			   openClients++;
 		   }
 		   remove(ID); 
        }
 	   else if(client.username == null){
 		   setName(input, client);
+	   }
+	   else if(!names.containsKey(client.username)){
+		   validateUser(input, client);
 	   }
       else{
     	  if((opponent) != -1){
@@ -83,13 +89,15 @@ public class ChatServer implements Runnable{
 	   String name = input.trim();
 	   if(!name.equals("") && !names.containsKey(name)){
 		   client.username = name;
-		   names.put(name, client);
-		   client.send("Name set to " + name);
-		   openClients++;
-		   showOpponents(client);
+		   client.send("Name not found. Create user " + name + "? Y/N");
 	   }
 	   else if(names.containsKey(name)){
-		   client.send("Name is already taken");
+		   if(names.get(name) != null)
+			   client.send("Name is already taken");
+		   else{
+			   client.username = name;
+			   client.send("Please enter password:");
+		   }
 	   }
 	   else{
 		   name = "Guest" + client.getID();
@@ -101,13 +109,34 @@ public class ChatServer implements Runnable{
 	   }
    }
    
+   private void validateUser(String input, ChatServerThread client){
+	   if(input.toUpperCase().equals("Y")){
+		   client.send("Please create password:");
+	   }
+	   else if(input.toUpperCase().equals("N")){
+		   client.username = null;
+		   client.send("Please enter your name:");
+	   }
+	   else if(!names.containsKey(client.username) && !input.trim().equals("")){
+		   client.user = new User(client.getID()); //client.user = new User(client.getID(), client.username, input.trim());
+		   names.put(client.username, client);
+		   openClients++;
+		   client.send("User " + client.username + " created.");
+		   showOpponents(client);
+	   }
+	   //we need to add code here that checks if the password matches user
+	   else{
+		   client.send("Password invalid. Retry or type 'N' to give a different name:");
+	   }
+   }
+   
    private void showOpponents(ChatServerThread client){
 	   if(openClients > 1){
 		   int thisClient = findClient(client.getID());
 		   client.send("Available opponents:");
 		   for (int i = 0; i < clientCount; i++){
 			   ChatServerThread temp = clients[i];
-			   if(i != thisClient && temp.opponentID == -1 && temp.username != null)
+			   if(i != thisClient && temp.opponentID == -1 && temp.user != null)
 				   client.send(temp.username);
 		   }
 		   client.send("Enter an opponent's name to challenge or hit enter to refresh");
@@ -120,7 +149,7 @@ public class ChatServer implements Runnable{
    private void findOpponent(String input, ChatServerThread client){
 	   if(openClients > 1){
 		   int ID = client.getID();
-		   if(!input.equals(client.username) && names.containsKey(input)){
+		   if(!input.equals(client.username) && names.get(input) != null){
 			   ChatServerThread op = (ChatServerThread) names.get(input);
 			   if(op.opponentID == -1){
 				   op.send(client.username + " is challenging you to a game. Do you want to play? Y/N");
@@ -145,10 +174,12 @@ public class ChatServer implements Runnable{
 	   ChatServerThread op = clients[findClient(client.opponentID)];
 		  if(input.toUpperCase().equals("Y") && op.opponentID == -2){
 			  op.opponentID = client.getID();
+			  op.user.conenctTo(client.getID());
+			  client.user.conenctTo(client.opponentID);
 			  op.send("Game Accepted");
 			  client.send("Game Accepted");
-			  client.send(".init");
-			  op.send(".init");
+			  client.send("play 1");
+			  op.send("play 2");
 		  }
 		  else if(input.toUpperCase().equals("N") && op.opponentID == -2){
 			  client.opponentID = -1;
