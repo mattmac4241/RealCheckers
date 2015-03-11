@@ -71,6 +71,9 @@ public class Game {
 		
 		
 	}
+	public int getWinner(){
+		return c.board.getWinner();
+	}
 	
 	}
 	

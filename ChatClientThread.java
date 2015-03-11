@@ -41,10 +41,12 @@ public class ChatClientThread extends Thread
 	   while (true)
       {  try
          {  client.handle(streamIn.readUTF());
+         
          }
          catch(IOException ioe)
          {  System.out.println("Listening error: " + ioe.getMessage());
          }
       }
    }
+  
 }

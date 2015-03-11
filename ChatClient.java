@@ -1,4 +1,5 @@
 import java.net.*;
+import java.util.Queue;
 import java.io.*;
 
 public class ChatClient implements Runnable
@@ -122,12 +123,17 @@ public class ChatClient implements Runnable
 	   else if(msg.substring(0, 6).equals("MOVE: ")){
 		   CheckersMove m  = g.createMove(msg);
 		   g.makeMove(m);
-			   if(g.c.board.currentPlayer == number){  // THIS IS WHERE THE PROBLEM IS GET IT TO CONTINUE TO READ IF STILL TURN
+			  if(g.c.board.currentPlayer == number){  // THIS IS WHERE THE PROBLEM IS GET IT TO CONTINUE TO READ IF STILL TURN
+			
 				   getMove();
+				
 			   }
-			   System.out.println(g.c.board.currentPlayer);
+			  while(g.c.board.currentPlayer == number){  
+					
+      			  getMove();
+			   }
 
-			  
+			
 		   }
      else
         System.out.println(msg);
@@ -145,8 +151,13 @@ public class ChatClient implements Runnable
 			 
 			   break;
 		   }
-
+		 
 	 }
+	   System.out.println("THIS IS SIZE: " + g.moveN());
+	   if(g.c.board.moves.size() > 0){
+		   System.out.println("WORKS");
+	   }
+
 	   System.out.println(x);
 		   try {
 				this.getOuptuStream().writeUTF(x);

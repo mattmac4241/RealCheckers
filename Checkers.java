@@ -1,12 +1,14 @@
 
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/master
 	import java.awt.*;
+
 	import java.awt.event.*;
-	import javax.swing.*;
-	import java.util.ArrayList;
+
+import javax.swing.*;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 
 	/**
@@ -121,7 +123,8 @@
 	    * the checkerboard.
 	    */
 	   class Board extends JPanel implements ActionListener, MouseListener {
-	      
+		   Queue<CheckersMove> moves = new LinkedList<CheckersMove>();
+
 		  CheckersMove currentMove; // The players latest move
 
 	      CheckersData board;  // The data for the checkers board is kept here.
@@ -142,7 +145,7 @@
 	      
 	      CheckersMove[] legalMoves;  // An array containing the legal moves for the
 	                                  //   current player.
-	      
+	      int winner = 0; // If winner =1 red wins if 3 black wins, 0 in progress 
 
 	      /**
 	       * Constructor.  Create the buttons and lable.  Listens for mouse
@@ -168,14 +171,18 @@
 	      }
 	      //Get the players latest move
 	      public CheckersMove getMove(){
-	    	  return currentMove;
+	    	  return moves.poll();
+	    	  //return currentMove;
 	      }
-	      
+	      public Queue getMoves(){
+	    	  return moves;
+	      }
 	      
 	      /**
 	       * Respond to user's click on one of the two buttons.
 	       */
 	      public void actionPerformed(ActionEvent evt) {
+	    	 
 	         Object src = evt.getSource();
 	         if (src == newGameButton)
 	            doNewGame();
@@ -213,13 +220,19 @@
 	            message.setText("There is no game in progress!");
 	            return;
 	         }
-	         if (currentPlayer == CheckersData.RED)
+	         if (currentPlayer == CheckersData.RED){
 	            gameOver("RED resigns.  BLACK wins.");
-	         else
+	         	winner = 3;
+	         }
+	         else{
 	            gameOver("BLACK resigns.  RED wins.");
+	         	winner = 1;
+	         }
 	      }
 	      
-	      
+	      public int getWinner(){
+	    	  return winner;
+	      }
 	      /**
 	       * The game ends.  The parameter, str, is displayed as a message
 	       * to the user.  The states of the buttons are adjusted so playes
@@ -272,8 +285,12 @@
 	         for (int i = 0; i < legalMoves.length; i++)
 	            if (legalMoves[i].fromRow == selectedRow && legalMoves[i].fromCol == selectedCol
 	                  && legalMoves[i].toRow == row && legalMoves[i].toCol == col) {
-	            	currentMove = legalMoves[i];
-	               doMakeMove(legalMoves[i]);
+	            	//currentMove = legalMoves[i];
+	            	
+	            	moves.add(legalMoves[i]);
+
+
+	            	doMakeMove(legalMoves[i]);
 	               
 	              // System.out.println(legalMoves[i].toString());
 	               return;
