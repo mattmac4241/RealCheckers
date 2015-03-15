@@ -1,4 +1,5 @@
 import java.net.*;
+import java.util.Queue;
 import java.io.*;
 
 public class ChatClient implements Runnable
@@ -7,6 +8,7 @@ public class ChatClient implements Runnable
    private DataInputStream  console   = null;
    private DataOutputStream streamOut = null;
    private ChatClientThread client    = null;
+   String name = null;
    Game g = null;
    boolean playing;
    int number;
@@ -65,6 +67,12 @@ public class ChatClient implements Runnable
       client.stop();
    }
    
+   public void setName(String name){
+	   this.name = name;
+   }
+   public String returnName(){
+	   return name;
+   }
    //Get output 
    public DataOutputStream getOuptuStream(){
 	   return streamOut;
@@ -122,12 +130,37 @@ public class ChatClient implements Runnable
 	   else if(msg.substring(0, 6).equals("MOVE: ")){
 		   CheckersMove m  = g.createMove(msg);
 		   g.makeMove(m);
-			   if(g.c.board.currentPlayer == number){  // THIS IS WHERE THE PROBLEM IS GET IT TO CONTINUE TO READ IF STILL TURN
+			  if(g.c.board.currentPlayer == number){  // THIS IS WHERE THE PROBLEM IS GET IT TO CONTINUE TO READ IF STILL TURN
+			
 				   getMove();
+				
 			   }
-			   System.out.println(g.c.board.currentPlayer);
-
 			  
+			  if(g.c.board.gameInProgress == true){
+				  while(g.c.board.currentPlayer == number){  
+					
+					  getMove();
+			   }
+			  }
+			  else{
+				  String w;
+				  if(g.getPlayer() == g.getWinner()){
+					  w= "WINNER";
+					  
+				  }
+				  else{
+					  w = "LOSER";
+				  }
+					  try {
+						this.getOuptuStream().writeUTF(w);
+						this.getOuptuStream().flush();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					  
+			  }
+			
 		   }
      else
         System.out.println(msg);
@@ -145,8 +178,13 @@ public class ChatClient implements Runnable
 			 
 			   break;
 		   }
-
+		 
 	 }
+	   System.out.println("THIS IS SIZE: " + g.moveN());
+	   if(g.c.board.moves.size() > 0){
+		   System.out.println("WORKS");
+	   }
+
 	   System.out.println(x);
 		   try {
 				this.getOuptuStream().writeUTF(x);

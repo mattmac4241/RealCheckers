@@ -56,7 +56,10 @@ public class ChatServer implements Runnable{
       return -1;
    }
    public synchronized void handle(int ID, String input){
+	   try{
+	   System.out.println("RECIEVED: " + input);
 	   ChatServerThread client = clients[findClient(ID)];
+
 	   int opponent = client.opponentID;
 	   if (input.equals(".bye")){
 		   client.send(".bye");
@@ -73,10 +76,21 @@ public class ChatServer implements Runnable{
     	  if((opponent) != -1){
 			  respondOpponent(input, client);
     	  }
+    	  else if(input.substring(0, 6).equals("MOVE: ") & input.length() > 9){
+    		   System.out.println("SENT: " + input);
+    		   ChatServerThread op = clients[findClient(client.opponentID)];
+				op.send(input);
+			}
+    	  
     	  else{
     		  findOpponent(input, client);
     	  }
       }
+	   }
+	   catch(IndexOutOfBoundsException e){
+		   
+	   }
+	   
    }
    
    private void setName(String input, ChatServerThread client){
@@ -147,8 +161,8 @@ public class ChatServer implements Runnable{
 			  op.opponentID = client.getID();
 			  op.send("Game Accepted");
 			  client.send("Game Accepted");
-			  client.send(".init");
-			  op.send(".init");
+			  client.send("play 1");
+			  op.send("play 2");
 		  }
 		  else if(input.toUpperCase().equals("N") && op.opponentID == -2){
 			  client.opponentID = -1;
@@ -159,8 +173,18 @@ public class ChatServer implements Runnable{
 		  else if (op.opponentID == -2){
 			  client.send("Please respond 'Y' or 'N'");
 		  }
+		  
+		  else if(input.substring(0, 6).equals("MOVE: ") & input.length() > 9){
+   		      System.out.println("SENT: " + input);
+
+   		        op = clients[findClient(client.opponentID)];
+				op.send(input);
+			}
+		  
+		  
 		  else{
-			  op.send(client.username + ": " + input);
+   		      System.out.println("SENT: " + input);
+			  op.send(input);
 		  }
    }
    

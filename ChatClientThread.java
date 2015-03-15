@@ -31,13 +31,7 @@ public class ChatClientThread extends Thread
    }
    public void run()
    {            	
-	   try {
-		client.getOuptuStream().writeUTF("Get connected clients");
-	} catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-
+	  
 	   while (true)
       {  try
          {  client.handle(streamIn.readUTF());

@@ -1,12 +1,14 @@
 
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/master
 	import java.awt.*;
+
 	import java.awt.event.*;
-	import javax.swing.*;
-	import java.util.ArrayList;
+
+import javax.swing.*;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 
 	/**
@@ -121,7 +123,8 @@
 	    * the checkerboard.
 	    */
 	   class Board extends JPanel implements ActionListener, MouseListener {
-	      
+		   Queue<CheckersMove> moves = new LinkedList<CheckersMove>();
+
 		  CheckersMove currentMove; // The players latest move
 
 	      CheckersData board;  // The data for the checkers board is kept here.
@@ -142,7 +145,7 @@
 	      
 	      CheckersMove[] legalMoves;  // An array containing the legal moves for the
 	                                  //   current player.
-	      
+	      int winner = 0; // If winner =1 red wins if 3 black wins, 0 in progress 
 
 	      /**
 	       * Constructor.  Create the buttons and lable.  Listens for mouse
@@ -168,14 +171,18 @@
 	      }
 	      //Get the players latest move
 	      public CheckersMove getMove(){
-	    	  return currentMove;
+	    	  return moves.poll();
+	    	  //return currentMove;
 	      }
-	      
+	      public Queue getMoves(){
+	    	  return moves;
+	      }
 	      
 	      /**
 	       * Respond to user's click on one of the two buttons.
 	       */
 	      public void actionPerformed(ActionEvent evt) {
+	    	 
 	         Object src = evt.getSource();
 	         if (src == newGameButton)
 	            doNewGame();
@@ -213,13 +220,19 @@
 	            message.setText("There is no game in progress!");
 	            return;
 	         }
-	         if (currentPlayer == CheckersData.RED)
+	         if (currentPlayer == CheckersData.RED){
 	            gameOver("RED resigns.  BLACK wins.");
-	         else
+	         	winner = 3;
+	         }
+	         else{
 	            gameOver("BLACK resigns.  RED wins.");
+	         	winner = 1;
+	         }
 	      }
 	      
-	      
+	      public int getWinner(){
+	    	  return winner;
+	      }
 	      /**
 	       * The game ends.  The parameter, str, is displayed as a message
 	       * to the user.  The states of the buttons are adjusted so playes
@@ -250,10 +263,10 @@
 	            if (legalMoves[i].fromRow == row && legalMoves[i].fromCol == col) {
 	               selectedRow = row;
 	               selectedCol = col;
-	               if (currentPlayer == CheckersData.RED)
-	                  message.setText("RED:  Make your move.");
-	               else
-	                  message.setText("BLACK:  Make your move.");
+//	               if (currentPlayer == CheckersData.RED)
+//	                  message.setText("RED:  Make your move.");
+//	               else
+//	                  message.setText("BLACK:  Make your move.");
 	               repaint();
 	               return;
 	            }
@@ -272,8 +285,12 @@
 	         for (int i = 0; i < legalMoves.length; i++)
 	            if (legalMoves[i].fromRow == selectedRow && legalMoves[i].fromCol == selectedCol
 	                  && legalMoves[i].toRow == row && legalMoves[i].toCol == col) {
-	            	currentMove = legalMoves[i];
-	               doMakeMove(legalMoves[i]);
+	            	//currentMove = legalMoves[i];
+	            	
+	            	moves.add(legalMoves[i]);
+
+
+	            	doMakeMove(legalMoves[i]);
 	               
 	              // System.out.println(legalMoves[i].toString());
 	               return;
@@ -298,7 +315,7 @@
 	    //	 System.out.println("CM : " + currentMove.toString()); 
 
 	         board.makeMove(move);
-	         
+	         message.setText(move.toString());
 	         /* If the move was a jump, it's possible that the player has another
 	          jump.  Check for legal jumps starting from the square that the player
 	          just moved to.  If there are any, the player must jump.  The same
@@ -308,10 +325,10 @@
 	         if (move.isJump()) {
 	            legalMoves = board.getLegalJumpsFrom(currentPlayer,move.toRow,move.toCol);
 	            if (legalMoves != null) {
-	               if (currentPlayer == CheckersData.RED)
-	                  message.setText("RED:  You must continue jumping.");
-	               else
-	                  message.setText("BLACK:  You must continue jumping.");
+	             //  if (currentPlayer == CheckersData.RED)
+	               //   message.setText("RED:  You must continue jumping.");
+	               //else
+	               //   message.setText("BLACK:  You must continue jumping.");
 	               selectedRow = move.toRow;  // Since only one piece can be moved, select it.
 	               selectedCol = move.toCol;
 	               repaint();
@@ -328,20 +345,20 @@
 	            legalMoves = board.getLegalMoves(currentPlayer);
 	            if (legalMoves == null)
 	               gameOver("BLACK has no moves.  RED wins.");
-	            else if (legalMoves[0].isJump())
-	               message.setText("BLACK:  Make your move.  You must jump.");
-	            else
-	               message.setText("BLACK:  Make your move.");
+//	            else if (legalMoves[0].isJump())
+//	               message.setText("BLACK:  Make your move.  You must jump.");
+//	            else
+//	               message.setText("BLACK:  Make your move.");
 	         }
 	         else {
 	            currentPlayer = CheckersData.RED;
 	            legalMoves = board.getLegalMoves(currentPlayer);
 	            if (legalMoves == null)
 	               gameOver("RED has no moves.  BLACK wins.");
-	            else if (legalMoves[0].isJump())
-	               message.setText("RED:  Make your move.  You must jump.");
-	            else
-	               message.setText("RED:  Make your move.");
+//	            else if (legalMoves[0].isJump())
+//	               message.setText("RED:  Make your move.  You must jump.");
+//	            else
+//	               message.setText("RED:  Make your move.");
 	         }
 	         
 	         /* Set selectedRow = -1 to record that the player has not yet selected
