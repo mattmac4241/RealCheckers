@@ -112,7 +112,7 @@ public class ChatClient implements Runnable
 		   startGameP1();
 	   }
 	   else if(msg.equals("play 2")){
-		  System.out.println("PLAY2 STARTED");
+		  //System.out.println("PLAY2 STARTED");
 		   startGameP2();
 		   
 			
@@ -120,20 +120,31 @@ public class ChatClient implements Runnable
 	   }
 	   
 	   //When the player receives a move and should make the move and then get the players next move
-	   else if(msg.substring(0, 6).equals("MOVE: ")){
+	   else if(msg.startsWith("MOVE: ")){
 		   CheckersMove m  = g.createMove(msg);
 		   g.makeMove(m);
-			  if(g.c.board.currentPlayer == number){  // THIS IS WHERE THE PROBLEM IS GET IT TO CONTINUE TO READ IF STILL TURN
-			
+		   if(g.getWinner() != 0){
+			   if(g.getWinner() != number){
+				   System.out.println("Sorry you lose.");
+				   try {
+						this.getOuptuStream().writeUTF("GAME ENDED");
+						this.getOuptuStream().flush();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			   }
+			   else
+				   System.out.println("You win!");
+			   return;
+		   }
+		   else if(g.c.board.currentPlayer == number){  // THIS IS WHERE THE PROBLEM IS GET IT TO CONTINUE TO READ IF STILL TURN
 				   getMove();
-				
+				   
 			   }
 			  while(g.c.board.currentPlayer == number){  
-					
       			  getMove();
 			   }
-
-			
 		   }
      else
         System.out.println(msg);
@@ -153,10 +164,13 @@ public class ChatClient implements Runnable
 		   }
 		 
 	 }
-	   System.out.println("THIS IS SIZE: " + g.moveN());
+	   if(x.trim().length() == 0){
+		   getMove();
+	   }
+	   /*System.out.println("THIS IS SIZE: " + g.moveN());
 	   if(g.c.board.moves.size() > 0){
 		   System.out.println("WORKS");
-	   }
+	   }*/
 
 	   System.out.println(x);
 		   try {

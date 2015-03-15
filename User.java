@@ -6,6 +6,7 @@ public class User {
 	private int connectedTo;
 	public boolean turn = false;
 	private String name;
+	private String password;
 	private int wins;
 	private int losses;
 
@@ -19,6 +20,7 @@ public class User {
 	public void setID(int id){
 		this.ID = id;
 	}
+
 	//Add a win to the user
 	public void won(){
 		this.wins +=1;
@@ -80,5 +82,11 @@ public class User {
 	
 	public void resetId(){
 		this.ID = 0;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
 	}
 }

@@ -204,7 +204,10 @@ import java.util.Queue;
 	         currentPlayer = CheckersData.RED;   // RED moves first.
 	         legalMoves = board.getLegalMoves(CheckersData.RED);  // Get RED's legal moves.
 	         selectedRow = -1;   // RED has not yet selected a piece to move.
-	         message.setText("Red:  Make your move.");
+	         if(currentPlayer == player)
+	        	 message.setText("Red:  Make your move.");
+	         else
+	        	 message.setText("Waiting on move from RED");
 	         gameInProgress = true;
 	         newGameButton.setEnabled(false);
 	         resignButton.setEnabled(true);
@@ -221,12 +224,12 @@ import java.util.Queue;
 	            return;
 	         }
 	         if (currentPlayer == CheckersData.RED){
-	            gameOver("RED resigns.  BLACK wins.");
-	         	winner = 3;
+	        	 winner = 3;
+	        	 gameOver("RED resigns.  BLACK wins.");
 	         }
 	         else{
+	        	 winner = 1;
 	            gameOver("BLACK resigns.  RED wins.");
-	         	winner = 1;
 	         }
 	      }
 	      
@@ -244,6 +247,7 @@ import java.util.Queue;
 	         newGameButton.setEnabled(true);
 	         resignButton.setEnabled(false);
 	         gameInProgress = false;
+	         
 	      }
 	      
 	      
@@ -343,22 +347,34 @@ import java.util.Queue;
 	         if (currentPlayer == CheckersData.RED) {
 	            currentPlayer = CheckersData.BLACK;
 	            legalMoves = board.getLegalMoves(currentPlayer);
-	            if (legalMoves == null)
+	            if (legalMoves == null){
+	            	winner = 1;
 	               gameOver("BLACK has no moves.  RED wins.");
-	            else if (legalMoves[0].isJump())
-	               message.setText("BLACK:  Make your move.  You must jump.");
+	            }
+	            else if(currentPlayer == player){ 
+	            	if (legalMoves[0].isJump())
+	            		message.setText("BLACK:  Make your move.  You must jump.");
+	            	else
+	            		message.setText("BLACK:  Make your move.");
+	            }
 	            else
-	               message.setText("BLACK:  Make your move.");
+	            	message.setText("Waiting on move from BLACK");
 	         }
 	         else {
 	            currentPlayer = CheckersData.RED;
 	            legalMoves = board.getLegalMoves(currentPlayer);
-	            if (legalMoves == null)
-	               gameOver("RED has no moves.  BLACK wins.");
-	            else if (legalMoves[0].isJump())
-	               message.setText("RED:  Make your move.  You must jump.");
+	            if (legalMoves == null){
+	            	winner = 3;
+	               gameOver("RED has no moves.  BLACK wins.");  
+	            }
+	            else if(currentPlayer == player){ 
+	            	if (legalMoves[0].isJump())
+	            		message.setText("RED:  Make your move.  You must jump.");
+	            	else
+	            		message.setText("RED:  Make your move.");
+	            }
 	            else
-	               message.setText("RED:  Make your move.");
+	            	message.setText("Waiting on move from RED");
 	         }
 	         
 	         /* Set selectedRow = -1 to record that the player has not yet selected
@@ -441,7 +457,7 @@ import java.util.Queue;
 	         /* If a game is in progress, hilite the legal moves.   Note that legalMoves
 	          is never null while a game is in progress. */      
 	         
-	         if (gameInProgress) {
+	         if (gameInProgress && currentPlayer == player) {
 	               /* First, draw a 2-pixel cyan border around the pieces that can be moved. */
 	            g.setColor(Color.cyan);
 	            for (int i = 0; i < legalMoves.length; i++) {

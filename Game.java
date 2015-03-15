@@ -28,7 +28,7 @@ public class Game {
 	private void startGame(){
 		
 		SwingUtilities.invokeLater(new Runnable(){
-	        @Override
+	        //@Override
 	        public void run(){
 	            JFrame frame = new JFrame();
 	            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -62,10 +62,10 @@ public class Game {
 		String s2 =  s.substring(8, 9);
 		String s3 =  s.substring(10, 11);
 		String s4 =  s.substring(12, 13);
-		int x1 = Integer.valueOf(s1);
-		int x2 = Integer.valueOf(s2);
-		int x3 = Integer.valueOf(s3);
-		int x4 = Integer.valueOf(s4);
+		int x1 = Integer.valueOf(s1).intValue();
+		int x2 = Integer.valueOf(s2).intValue();
+		int x3 = Integer.valueOf(s3).intValue();
+		int x4 = Integer.valueOf(s4).intValue();
 		CheckersMove m = new CheckersMove(x1,x2,x3,x4);
 		return m;
 		

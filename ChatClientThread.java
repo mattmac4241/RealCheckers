@@ -31,12 +31,12 @@ public class ChatClientThread extends Thread
    }
    public void run()
    {            	
-	   try {
+	   /*try {
 		client.getOuptuStream().writeUTF("Get connected clients");
 	} catch (IOException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
-	}
+	}*/
 
 	   while (true)
       {  try
@@ -45,6 +45,7 @@ public class ChatClientThread extends Thread
          }
          catch(IOException ioe)
          {  System.out.println("Listening error: " + ioe.getMessage());
+         	break;
          }
       }
    }
