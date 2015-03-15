@@ -205,6 +205,7 @@ public class ChatServer implements Runnable{
 		  }
 		  else if(input.toUpperCase().equals("N") && op.opponentID == -2){
 			  client.opponentID = -1;
+			  op.opponentID = -1;
 			  op.send("Game Rejected");
 			  client.send("Game Rejected");
 			  openClients = openClients + 2;
