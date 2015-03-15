@@ -164,7 +164,7 @@ public class ChatServer implements Runnable{
 			  client.send("play 1");
 			  op.send("play 2");
 		  }
-		  else if(input.toUpperCase().equals("N") /* && op.opponentID == -2 */ ){
+		  else if(input.toUpperCase().equals("N") ){
 			  client.opponentID = -1;
 			  op.send("Game Rejected");
 			  client.send("Game Rejected");
