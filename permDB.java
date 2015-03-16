@@ -1,5 +1,6 @@
 import java.net.*;
 import java.io.*;
+import java.util.Arrays;
 
 public class permDB {
 
@@ -31,6 +32,9 @@ public class permDB {
 				break;
 			}
 		}
+		if (what == false){
+			saveUsers();
+		}		
 		//	System.out.println("HERE " + additive.getName() + ulist[0].getName());
 	}
 
@@ -61,7 +65,24 @@ public class permDB {
 		return false;
 	}
 	
+	public String[][] weightedRanks() {
+		readUsers();
+		String[][] wR = new String[50][2];
+		
+		for (int i = 0; i < ulist.length; i++){
+			if (ulist[i] != null){
+				wR[i][0] = ulist[i].getName();
+				wR[i][1] = "0";
+				if ((ulist[i].getWins() + ulist[i].getLosses()) != 0){
+					int weighted = ulist[i].getWins() * 100 / (ulist[i].getWins() + ulist[i].getLosses()); 
+					wR[i][1] = "" + weighted;
+				}
+			}
+		}
 
+		return wR;
+
+	}
 	
 	public void saveUsers()  {
 		int le = ulist.length;

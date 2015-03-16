@@ -199,20 +199,13 @@ public class ChatServer implements Runnable{
    }
    
    private void playersRanked(ChatServerThread client){
-	   int thisClient = findClient(client.getID());
-	   client.send("List of players and records: ");
-	   for (int i = 0; i < clientCount; i++) {
-		   client.send("Got this far");
-		   ChatServerThread temp = clients[i];
-		   if (temp.user != null) {
-			   client.send("Got this far 2");
-			   double wrec = 0;
-			   if ((temp.user.getWins() + temp.user.getLosses()) > 0){
-				   wrec = (temp.user.getWins() * 100 / (temp.user.getWins() + temp.user.getLosses())); 
-			   }
-			   client.send(temp.username + " Weighted Record: " + wrec);
-		   }
-	   }
+		String[][] wR = go.weightedRanks();
+		
+		for (int i = 0; i < 50; i++){
+			if (wR[i][0] != null){
+				client.send(wR[i][0] + ": " + wR[i][1]);
+			}
+		}
    }
    
    private void findOpponent(String input, ChatServerThread client){
