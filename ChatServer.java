@@ -148,13 +148,8 @@ public class ChatServer implements Runnable{
 		   showOpponents(client);
 	   }
 	   //we need to add code here that checks if the password matches user
-<<<<<<< HEAD
 	   else if((client.user = go.pwMatch(client.username, input)) != null){
-=======
-	   else if(client.user.getPassword().equals(input.trim())){
->>>>>>> origin/Matt
 		   client.send("Login successful");
-		   //client.user = Database.getUser(client.username);
 		   client.user.setID(client.getID());
 		   names.put(client.username, client);
 		   openClients++;
