@@ -89,4 +89,12 @@ public class User {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+	
+	public void bulkWon(int i){
+		this.wins += i;
+	}
+	
+	public void bulkLoss(int i){
+		this.losses += i;
+	}
 }

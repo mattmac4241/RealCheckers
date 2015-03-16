@@ -86,7 +86,12 @@ public class ChatServer implements Runnable{
 			  respondOpponent(input, client);
     	  }
     	  else{
-    		  findOpponent(input, client);
+    		  if (input.equals("")){
+    			  showOpponents(client);
+    		  }
+    		  else{
+    			  findOpponent(input, client);
+    		  }
     	  }
       }
    }

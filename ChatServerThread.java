@@ -42,7 +42,7 @@ public class ChatServerThread extends Thread{
 	   send("\n-----------------------------");
 	   send("Welcome to the King Me Server");
 	   send("-----------------------------");
-	   send("\nPlease enter your name:");
+	   send("\nPlease enter your name or press enter for an assigned name:");
 	   while (running){
 		   try{
 			   server.handle(ID, streamIn.readUTF());
