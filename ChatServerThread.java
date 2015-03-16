@@ -49,7 +49,7 @@ public class ChatServerThread extends Thread{
 		   }
 		   catch(IOException ioe){
 			   System.out.println(ID + " ERROR reading: " + ioe.getMessage());
-			   server.remove(ID);
+			   server.handle(ID, ".bye");
 			   interrupt();
 		   }
 		   catch(ArrayIndexOutOfBoundsException e){ continue; }

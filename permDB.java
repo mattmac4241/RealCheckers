@@ -3,41 +3,38 @@ import java.io.*;
 
 public class permDB {
 
-	static User[] ulist = new User[50];
+	public volatile User[] ulist = new User[50];
+	 
+	public permDB(){
+		readUsers();
+	}
 
-
-	public static void update(User additive, boolean what)  {
+	public void update(User additive, boolean what)  {
 		if (what == false){
 			readUsers();
 		}
 		int le = ulist.length;
 		String name = additive.getName();
-		boolean exists = false;
-		if (ulist[0] != null){
-			for (int i = 0; i < le; i++){
-				if (ulist[i] != null && ulist[i].getName().equals(name)){
-					exists = true;
-					//ulist[i].setPassword(additive.getPassword());
-					ulist[i].bulkWon(additive.getWins());
-					ulist[i].bulkLoss(additive.getLosses());
-					break;
-				}
-				else if (ulist[i] == null && exists == false){
-					ulist[i] = additive;
-					break;
-				}
+		//boolean exists = false;
+		for (int i = 0; i < le; i++){
+			System.out.println(ulist[0]);
+			if (ulist[i] != null && name.equals(ulist[i].getName())){
+				//exists = true;
+				//ulist[i].setPassword(additive.getPassword());
+				ulist[i].bulkWon(additive.getWins());
+				ulist[i].bulkLoss(additive.getLosses());
+				break;
+			}
+			else if (ulist[i] == null){
+				ulist[i] = additive;
+				System.out.println(ulist[i].getName() + " " + i + le);
+				break;
 			}
 		}
-		else {
-			ulist[0] = additive;
-		}
 		//	System.out.println("HERE " + additive.getName() + ulist[0].getName());
-		if (what == false){
-			saveUsers();
-		}
 	}
 
-	public static User pwMatch (String name, String input) {
+	public User pwMatch (String name, String input) {
 		readUsers();
 		
 		int le = ulist.length;
@@ -52,7 +49,7 @@ public class permDB {
 		return null;
 	}
 	
-	public static boolean userExists(String name) {
+	public boolean userExists(String name) {
 		readUsers();
 		int le = ulist.length;
 		
@@ -66,7 +63,7 @@ public class permDB {
 	
 
 	
-	public static void saveUsers()  {
+	public void saveUsers()  {
 		int le = ulist.length;
 
 		try {
@@ -87,18 +84,16 @@ public class permDB {
 		} 
 	}
 
-	public static void readUsers() {
+	public void readUsers() {
 		File file = new File("userList.txt");
 		try {
 			BufferedReader file_reader = new BufferedReader( new FileReader(file) );
-
 			String line;
-			User noob = new User();
+			
 
 			while ( (line = file_reader.readLine() ) != null) {
-
+				User noob = new User();
 				String[] sLine = line.split(" ");
-
 				noob.setID(Integer.valueOf(sLine[0]));
 				noob.setName(sLine[1]);
 				noob.setPassword(sLine[2]);

@@ -91,10 +91,10 @@ public class User {
 	}
 	
 	public void bulkWon(int i){
-		this.wins += i;
+		this.wins = i;
 	}
 	
 	public void bulkLoss(int i){
-		this.losses += i;
+		this.losses = i;
 	}
 }

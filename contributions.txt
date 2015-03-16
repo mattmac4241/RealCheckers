@@ -1,0 +1,19 @@
+CSC 376 Distributed Systems
+Winter 2014-2015
+DePaul University
+Karen Heart, Instructor
+ 
+Group Project Credits
+ 
+Project Name: Checkers
+ 
+List each group member, followed by a brief description of 
+the member's coding contribution
+Example: Bob Hackworth    wrote main() and the point scoring functions
+ 
+NOTE:  List one member per line
+ 
+Group Member		Contribution
+Jon Perkowski		ChatServer, ChatClient, ChatServerThread, ChatClientThread(messaging & connectivity functions & UI); Checkers, Game(turn system & winner declaration & bug fixes)
+Matt MacCabe		Checkers, CheckersMove, Game(move funtions), ChatServer, ChatClient, ChatServerThread, ChatClientThread(bug fixes & get move functions)
+Shawn Tuttle		permDB, ChatServer, ChatClient, User(User validation & keyword protections & player ranking & bug fixes)

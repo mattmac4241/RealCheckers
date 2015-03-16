@@ -1,6 +1,7 @@
 
 import java.net.*;
 import java.util.HashMap;
+import java.util.Scanner;
 import java.io.*;
 
 public class ChatServer implements Runnable{
@@ -11,7 +12,8 @@ public class ChatServer implements Runnable{
 	private int openClients = 0;
 	private HashMap<String, ChatServerThread> names = new HashMap<String, ChatServerThread>();
 	private permDB go = new permDB();
-	
+	private final String[] keywords = {"Guest", "play 1", "play 2", "MOVE:", "GAME ENDED", "Game Accepted", "Game Rejected"};
+	DataInputStream in = null;
 
 	public ChatServer(int port){
 	   try{
@@ -37,7 +39,25 @@ public class ChatServer implements Runnable{
 		   }
 	   }
    }
-   
+    public void close(){
+    	go.saveUsers();
+    	stop();
+    	for(ChatServerThread i : clients){
+    		i.send("Server shutting down...");
+    		try {
+				i.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+    	try {
+			server.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
    public void start(){
 	   if (thread == null){  
 		   thread = new Thread(this); 
@@ -49,6 +69,7 @@ public class ChatServer implements Runnable{
 	   if (thread != null){
 		   thread.interrupt(); 
 		   thread = null;
+		   System.out.println("Shutting down");
 	   } 
    }
    
@@ -68,7 +89,6 @@ public class ChatServer implements Runnable{
 	   if (input.equals(".bye")){
 		   if(client.user != null)
 			   openClients--;
-		   client.send(".bye");
 		   if(opponent != -1){
 			   clients[findClient(opponent)].send("Game Ended");
 			   clients[findClient(opponent)].opponentID = -1;
@@ -148,11 +168,8 @@ public class ChatServer implements Runnable{
 		   showOpponents(client);
 	   }
 	   //we need to add code here that checks if the password matches user
-<<<<<<< HEAD
 	   else if((client.user = go.pwMatch(client.username, input)) != null){
-=======
-	   else if(client.user.getPassword().equals(input.trim())){
->>>>>>> origin/Matt
+
 		   client.send("Login successful");
 		   //client.user = Database.getUser(client.username);
 		   client.user.setID(client.getID());
@@ -260,6 +277,9 @@ public class ChatServer implements Runnable{
 			  client.opponentID = -1;
 			  op.opponentID = -1;
 			  openClients += 2;  
+		  }
+		  else if(client.username.equals("admin") && input.equals("shutdown")){
+			  close();
 		  }
 		  else if(input.trim().length() != 0){
 			  op.send(input);
