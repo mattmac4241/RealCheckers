@@ -39,9 +39,9 @@ public class permDB {
 
 	public static User pwMatch (String name, String input) {
 		readUsers();
-		
+
 		int le = ulist.length;
-		
+
 		for (int i = 0; i < le; i++){
 			if (ulist[i] != null && ulist[i].getName().equals(name)){
 				if (ulist[i].getPassword().equals(input)){
@@ -51,21 +51,21 @@ public class permDB {
 		}
 		return null;
 	}
-	
+
 	public static boolean userExists(String name) {
 		readUsers();
 		int le = ulist.length;
-		
+
 		for (int i = 0; i < le; i++){
 			if (ulist[i] != null && ulist[i].getName().equals(name)){
-					return true;
+				return true;
 			}
 		}
 		return false;
 	}
-	
 
-	
+
+
 	public static void saveUsers()  {
 		int le = ulist.length;
 
@@ -89,30 +89,32 @@ public class permDB {
 
 	public static void readUsers() {
 		File file = new File("userList.txt");
-		try {
-			BufferedReader file_reader = new BufferedReader( new FileReader(file) );
+		if (file.exists()){
+			try {
+				BufferedReader file_reader = new BufferedReader( new FileReader(file) );
 
-			String line;
-			User noob = new User();
+				String line;
+				User noob = new User();
 
-			while ( (line = file_reader.readLine() ) != null) {
+				while ( (line = file_reader.readLine() ) != null) {
 
-				String[] sLine = line.split(" ");
+					String[] sLine = line.split(" ");
 
-				noob.setID(Integer.valueOf(sLine[0]));
-				noob.setName(sLine[1]);
-				noob.setPassword(sLine[2]);
-				noob.bulkWon(Integer.valueOf(sLine[3]));
-				noob.bulkLoss(Integer.valueOf(sLine[4]));
+					noob.setID(Integer.valueOf(sLine[0]));
+					noob.setName(sLine[1]);
+					noob.setPassword(sLine[2]);
+					noob.bulkWon(Integer.valueOf(sLine[3]));
+					noob.bulkLoss(Integer.valueOf(sLine[4]));
 
-				update(noob, true);
+					update(noob, true);
+				}
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace(); 
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace(); 
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 }
