@@ -1,7 +1,6 @@
 import java.net.*;
 import java.io.*;
 
-import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion.User;
 
 public class permDB {
 
