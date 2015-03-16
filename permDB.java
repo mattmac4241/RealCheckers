@@ -1,6 +1,8 @@
 import java.net.*;
 import java.io.*;
 
+import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion.User;
+
 public class permDB {
 
 	static User[] ulist = new User[50];
@@ -64,7 +66,29 @@ public class permDB {
 		return false;
 	}
 
+	public static boolean isBadWord(String input){
+		String[] badWords = {"MOVE",  "Game Accepted", "play 1", "play 2",  "Game Rejected", 
+				"GAME ENDED", "You win!"};
+		for (int i = 0; i < badWords.length; i++){
+			if (input.equalsIgnoreCase(badWords[i]) || 
+					input.toLowerCase().startsWith(badWords[i].toLowerCase()) ){
+				return true;
+			}
+			else if (input.equalsIgnoreCase("Y") || input.equalsIgnoreCase("N")){
+				return true;
+			}
+		}
+		return false;
+	}
 
+	/*
+	public static String[] rankings(){
+		readUsers();
+		String[] top10 = new String[10];
+		for (int i = 0; i < ulist.length; i++){
+			
+		}
+	}  */
 
 	public static void saveUsers()  {
 		int le = ulist.length;

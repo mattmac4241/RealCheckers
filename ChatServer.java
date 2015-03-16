@@ -81,6 +81,7 @@ public class ChatServer implements Runnable{
 		   else{
 			   names.put(client.username, null);
 		   }
+		   go.update(client.user, false);
 		   remove(ID); 
        }
 	   
@@ -105,7 +106,7 @@ public class ChatServer implements Runnable{
    
    private void setName(String input, ChatServerThread client){
 	   String name = input.trim();
-	   if(!name.equals("") && !go.userExists(name) /*!names.containsKey(name)*/){
+	   if(!name.equals("") && !go.userExists(name) && !go.isBadWord(name) /*!names.containsKey(name)*/){
 		   client.username = name;
 		   client.send("Name not found. Enter a password to create user " + name + " or enter 'N' to pick a different name:");
 	   }
