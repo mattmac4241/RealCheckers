@@ -10,6 +10,8 @@ public class ChatServer implements Runnable{
 	private int clientCount = 0;
 	private int openClients = 0;
 	private HashMap<String, ChatServerThread> names = new HashMap<String, ChatServerThread>();
+	private permDB go = new permDB();
+	
 
 	public ChatServer(int port){
 	   try{
@@ -49,15 +51,20 @@ public class ChatServer implements Runnable{
 		   thread = null;
 	   } 
    }
+   
    private int findClient(int ID)
    {  for (int i = 0; i < clientCount; i++)
          if (clients[i].getID() == ID)
             return i;
       return -1;
    }
+   
    public synchronized void handle(int ID, String input){
 	   ChatServerThread client = clients[findClient(ID)];
 	   int opponent = client.opponentID;
+ 		if (input.equals("list")) {
+		   playersRanked(client);
+	   }
 	   if (input.equals(".bye")){
 		   if(client.user != null)
 			   openClients--;
@@ -68,6 +75,7 @@ public class ChatServer implements Runnable{
 			   openClients++;
 		   }
 		   if(client.username != null && client.username.startsWith("Guest")){
+
 			   names.remove(client.username);
 		   }
 		   else{
@@ -75,35 +83,34 @@ public class ChatServer implements Runnable{
 		   }
 		   remove(ID); 
        }
+	   
 	   else if(client.username == null){
 		   setName(input, client);
 	   }
+	   
 	   else if(!names.containsKey(client.username) || names.get(client.username) == null){
 		   validateUser(input, client);
 	   }
-      else{
+	   
+       else{
     	  if((opponent) != -1){
 			  respondOpponent(input, client);
     	  }
     	  else{
-    		  if (input.equals("")){
-    			  showOpponents(client);
-    		  }
-    		  else{
     			  findOpponent(input, client);
-    		  }
+    		  
     	  }
       }
    }
    
    private void setName(String input, ChatServerThread client){
 	   String name = input.trim();
-	   if(!name.equals("") && !names.containsKey(name)){
+	   if(!name.equals("") && !go.userExists(name) /*!names.containsKey(name)*/){
 		   client.username = name;
 		   client.send("Name not found. Enter a password to create user " + name + " or enter 'N' to pick a different name:");
 	   }
-	   else if(names.containsKey(name)){
-		   if(names.get(name) != null)
+	   else if( go.userExists(name) /*names.containsKey(name)*/){
+		   if( names.get(name) != null )
 			   client.send("Name is already taken");
 		   else{
 			   client.username = name;
@@ -122,27 +129,29 @@ public class ChatServer implements Runnable{
    }
    
    private void validateUser(String input, ChatServerThread client){
-	   if(input.toUpperCase().equals("Y")){
+/*	   if(input.toUpperCase().equals("Y")){
 		   client.send("Please create password:");
-	   }
-	   else if(input.toUpperCase().equals("N")){
+	   } */
+	   if(input.toUpperCase().equals("N")){
 		   client.username = null;
 		   client.send("Please enter your name:");
 	   }
-	   else if(!names.containsKey(client.username) && !input.trim().equals("")){
+	   else if(!go.userExists(client.username) /*names.containsKey(client.username)*/ && !input.trim().equals("")){
 		   client.user = new User();
 		   client.user.setID(client.getID());
 		   client.user.setName(client.username);
 		   client.user.setPassword(input.trim());
 		   names.put(client.username, client);
+		   go.update(client.user, false);
 		   openClients++;
 		   client.send("User " + client.username + " created.");
 		   showOpponents(client);
 	   }
 	   //we need to add code here that checks if the password matches user
-	   else if(true/*Database.getPassword(client.username).equals(input.trim())*/){
+	   else if((client.user = go.pwMatch(client.username, input)) != null){
 		   client.send("Login successful");
 		   //client.user = Database.getUser(client.username);
+		   client.user.setID(client.getID());
 		   names.put(client.username, client);
 		   openClients++;
 		   showOpponents(client);
@@ -165,6 +174,23 @@ public class ChatServer implements Runnable{
 	   }
 	   else{
 		   client.send("Waiting for opponents. Hit enter to refresh");
+	   }
+   }
+   
+   private void playersRanked(ChatServerThread client){
+	   int thisClient = findClient(client.getID());
+	   client.send("List of players and records: ");
+	   for (int i = 0; i < clientCount; i++) {
+		   client.send("Got this far");
+		   ChatServerThread temp = clients[i];
+		   if (temp.user != null) {
+			   client.send("Got this far 2");
+			   double wrec = 0;
+			   if ((temp.user.getWins() + temp.user.getLosses()) > 0){
+				   wrec = (temp.user.getWins() * 100 / (temp.user.getWins() + temp.user.getLosses())); 
+			   }
+			   client.send(temp.username + " Weighted Record: " + wrec);
+		   }
 	   }
    }
    
