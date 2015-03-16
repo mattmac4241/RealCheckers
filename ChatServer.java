@@ -135,7 +135,7 @@ public class ChatServer implements Runnable{
 		   showOpponents(client);
 	   }
 	   //we need to add code here that checks if the password matches user
-	   else if(true/*Database.getPassword(client.username).equals(input.trim())*/){
+	   else if(client.user.getPassword().equals(input.trim())){
 		   client.send("Login successful");
 		   //client.user = Database.getUser(client.username);
 		   names.put(client.username, client);
@@ -200,6 +200,7 @@ public class ChatServer implements Runnable{
 		  }
 		  else if(input.toUpperCase().equals("N") && op.opponentID == -2){
 			  client.opponentID = -1;
+			  op.opponentID = -1;
 			  op.send("Game Rejected");
 			  client.send("Game Rejected");
 			  openClients = openClients + 2;
@@ -209,11 +210,13 @@ public class ChatServer implements Runnable{
 		  }
 		  else if(input.startsWith("MOVE: ") & input.length() > 9){
 			  op.send(input);
+			  System.out.println(input);
 		  }
 		  else if(input.equals("GAME ENDED")){
 			  client.user.loss();
 			  op.user.won();
 			  System.out.println(op.username);
+			  op.send("GAME ENDED");
 			  op.send("You win!");
 			  op.send("Your record is now " + op.user.getWins() + " wins and " 
 					  + op.user.getLosses() + " losses.");
