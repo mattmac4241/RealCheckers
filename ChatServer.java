@@ -148,7 +148,11 @@ public class ChatServer implements Runnable{
 		   showOpponents(client);
 	   }
 	   //we need to add code here that checks if the password matches user
+<<<<<<< HEAD
 	   else if((client.user = go.pwMatch(client.username, input)) != null){
+=======
+	   else if(client.user.getPassword().equals(input.trim())){
+>>>>>>> origin/Matt
 		   client.send("Login successful");
 		   //client.user = Database.getUser(client.username);
 		   client.user.setID(client.getID());
@@ -241,11 +245,13 @@ public class ChatServer implements Runnable{
 		  }
 		  else if(input.startsWith("MOVE: ") & input.length() > 9){
 			  op.send(input);
+			  System.out.println(input);
 		  }
 		  else if(input.equals("GAME ENDED")){
 			  client.user.loss();
 			  op.user.won();
 			  System.out.println(op.username);
+			  op.send("GAME ENDED");
 			  op.send("You win!");
 			  op.send("Your record is now " + op.user.getWins() + " wins and " 
 					  + op.user.getLosses() + " losses.");

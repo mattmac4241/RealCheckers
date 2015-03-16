@@ -108,6 +108,9 @@ public class ChatClient implements Runnable
 		   System.out.println("Good bye. Press RETURN to exit ...");
         	stop();
 		}
+	   else if (msg.equals("GAME ENDED")){
+		   this.playing = false;
+	   }
 	   else if(msg.equals("play 1")){
 		   startGameP1();
 	   }
@@ -115,7 +118,6 @@ public class ChatClient implements Runnable
 		  //System.out.println("PLAY2 STARTED");
 		   startGameP2();
 		   
-			
 		   
 	   }
 	   
@@ -126,6 +128,7 @@ public class ChatClient implements Runnable
 		   if(g.getWinner() != 0){
 			   if(g.getWinner() != number){
 				   System.out.println("Sorry you lose.");
+				   this.playing = false;
 				   try {
 						this.getOuptuStream().writeUTF("GAME ENDED");
 						this.getOuptuStream().flush();
@@ -154,7 +157,7 @@ public class ChatClient implements Runnable
    public void getMove(){
 	   CheckersMove m = null;
 	   String x = "";
-	   while (g.getMove() == null){
+	   while ((m = g.getMove()) == null){
 		   System.out.print("");
 		   m = g.getMove();
 		   if(m != null){
@@ -165,7 +168,7 @@ public class ChatClient implements Runnable
 		 
 	 }
 	   if(x.trim().length() == 0){
-		   getMove();
+		  getMove();
 	   }
 	   /*System.out.println("THIS IS SIZE: " + g.moveN());
 	   if(g.c.board.moves.size() > 0){
@@ -174,8 +177,10 @@ public class ChatClient implements Runnable
 
 	   System.out.println(x);
 		   try {
+			   if(x != ""){
 				this.getOuptuStream().writeUTF(x);
 				this.getOuptuStream().flush();
+			   }
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
