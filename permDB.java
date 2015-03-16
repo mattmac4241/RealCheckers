@@ -17,7 +17,7 @@ public class permDB {
 		String name = additive.getName();
 		//boolean exists = false;
 		for (int i = 0; i < le; i++){
-			System.out.println(ulist[0]);
+			//System.out.println(ulist[0]);
 			if (ulist[i] != null && name.equals(ulist[i].getName())){
 				//exists = true;
 				//ulist[i].setPassword(additive.getPassword());
@@ -27,7 +27,7 @@ public class permDB {
 			}
 			else if (ulist[i] == null){
 				ulist[i] = additive;
-				System.out.println(ulist[i].getName() + " " + i + le);
+			//	System.out.println(ulist[i].getName() + " " + i + le);
 				break;
 			}
 		}
