@@ -67,15 +67,17 @@ public class permDB {
 	
 	public String[][] weightedRanks() {
 		readUsers();
-		String[][] wR = new String[50][2];
+		String[][] wR = new String[50][4];
 		
 		for (int i = 0; i < ulist.length; i++){
 			if (ulist[i] != null){
 				wR[i][0] = ulist[i].getName();
-				wR[i][1] = "0";
+				wR[i][1] = ""+ulist[i].getWins();
+				wR[i][2] = ""+ulist[i].getLosses();
+				wR[i][3] = "0";
 				if ((ulist[i].getWins() + ulist[i].getLosses()) != 0){
 					int weighted = ulist[i].getWins() * 100 / (ulist[i].getWins() + ulist[i].getLosses()); 
-					wR[i][1] = "" + weighted;
+					wR[i][3] = "" + weighted;
 				}
 			}
 		}

@@ -203,7 +203,7 @@ public class ChatServer implements Runnable{
 		
 		for (int i = 0; i < 50; i++){
 			if (wR[i][0] != null){
-				client.send(wR[i][0] + ": " + wR[i][1]);
+				client.send(wR[i][0] + ": Wins: " + wR[i][1] + " Losses: " + wR[i][2] + " Weighted Score: " + wR[i][3]);
 			}
 		}
    }
