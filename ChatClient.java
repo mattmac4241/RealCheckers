@@ -157,7 +157,7 @@ public class ChatClient implements Runnable
    public void getMove(){
 	   CheckersMove m = null;
 	   String x = "";
-	   while (g.getMove() == null){
+	   while ((m = g.getMove()) == null){
 		   System.out.print("");
 		   m = g.getMove();
 		   if(m != null){
@@ -168,7 +168,7 @@ public class ChatClient implements Runnable
 		 
 	 }
 	   if(x.trim().length() == 0){
-		   getMove();
+		  getMove();
 	   }
 	   /*System.out.println("THIS IS SIZE: " + g.moveN());
 	   if(g.c.board.moves.size() > 0){
