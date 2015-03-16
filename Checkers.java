@@ -1,7 +1,6 @@
 
 
 	import java.awt.*;
-
 	import java.awt.event.*;
 
 import javax.swing.*;
@@ -39,19 +38,7 @@ import java.util.Queue;
 	    * application.  Opens a window showing a Checkers panel; the program
 	    * ends when the user closes the window.
 	    */
-	   public static void main(String[] args) {
-	      JFrame window = new JFrame("Checkers");
-	    //  Checkers content = new Checkers();
-	      //window.setContentPane(content);
-	      window.pack();
-	      Dimension screensize = Toolkit.getDefaultToolkit().getScreenSize();
-	      window.setLocation( (screensize.width - window.getWidth())/2,
-	            (screensize.height - window.getHeight())/2 );
-	      window.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-	      window.setResizable(false);  
-	      window.setVisible(true);
-	   }
-	   
+
 	   /**
 	    * Nested applet class that can be used to run Checkers as an
 	    * applet.  Size of the applet should be 350-by-250
@@ -62,8 +49,8 @@ import java.util.Queue;
 	      }
 	   }
 	   
-	   private JButton newGameButton;  // Button for starting a new game.
-	   private JButton resignButton;   // Button that a player can use to end 
+//	   private JButton newGameButton;  // Button for starting a new game.
+//	   private JButton resignButton;   // Button that a player can use to end 
 	                                   // the game by resigning.
 	   
 	   private JLabel message;  // Label for displaying messages to the user.
@@ -88,16 +75,14 @@ import java.util.Queue;
 	                                  //   and label.
 	      
 	      add(board);
-	      add(newGameButton);
-	      add(resignButton);
+	     
 	      add(message);
 	      
 	      /* Set the position and size of each component by calling
 	       its setBounds() method. */
 	      
 	      board.setBounds(20,20,164,164); // Note:  size MUST be 164-by-164 !
-	      newGameButton.setBounds(210, 60, 120, 30);
-	      resignButton.setBounds(210, 120, 120, 30);
+	      
 	      message.setBounds(0, 200, 350, 30);
 	      
 	   } // end constructor
@@ -155,10 +140,7 @@ import java.util.Queue;
 	      Board() {
 	         setBackground(Color.BLACK);
 	         addMouseListener(this);
-	         resignButton = new JButton("Resign");
-	         resignButton.addActionListener(this);
-	         newGameButton = new JButton("New Game");
-	         newGameButton.addActionListener(this);
+	         
 	         message = new JLabel("",JLabel.CENTER);
 	         message.setFont(new  Font("Serif", Font.BOLD, 14));
 	         message.setForeground(Color.green);
@@ -178,17 +160,9 @@ import java.util.Queue;
 	    	  return moves;
 	      }
 	      
-	      /**
-	       * Respond to user's click on one of the two buttons.
-	       */
-	      public void actionPerformed(ActionEvent evt) {
+	  
 	    	 
-	         Object src = evt.getSource();
-	         if (src == newGameButton)
-	            doNewGame();
-	         else if (src == resignButton)
-	            doResign();
-	      }
+	        
 	      
 	      
 	      /**
@@ -204,10 +178,11 @@ import java.util.Queue;
 	         currentPlayer = CheckersData.RED;   // RED moves first.
 	         legalMoves = board.getLegalMoves(CheckersData.RED);  // Get RED's legal moves.
 	         selectedRow = -1;   // RED has not yet selected a piece to move.
-	         message.setText("Red:  Make your move.");
+	         if(currentPlayer == player)
+	        	 message.setText("Red:  Make your move.");
+	         else
+	        	 message.setText("Waiting on move from RED");
 	         gameInProgress = true;
-	         newGameButton.setEnabled(false);
-	         resignButton.setEnabled(true);
 	         repaint();
 	      }
 	      
@@ -221,12 +196,12 @@ import java.util.Queue;
 	            return;
 	         }
 	         if (currentPlayer == CheckersData.RED){
-	            gameOver("RED resigns.  BLACK wins.");
-	         	winner = 3;
+	        	 winner = 3;
+	        	 gameOver("RED resigns.  BLACK wins.");
 	         }
 	         else{
+	        	 winner = 1;
 	            gameOver("BLACK resigns.  RED wins.");
-	         	winner = 1;
 	         }
 	      }
 	      
@@ -241,9 +216,8 @@ import java.util.Queue;
 	       */
 	      void gameOver(String str) {
 	         message.setText(str);
-	         newGameButton.setEnabled(true);
-	         resignButton.setEnabled(false);
 	         gameInProgress = false;
+	         
 	      }
 	      
 	      
@@ -263,10 +237,10 @@ import java.util.Queue;
 	            if (legalMoves[i].fromRow == row && legalMoves[i].fromCol == col) {
 	               selectedRow = row;
 	               selectedCol = col;
-//	               if (currentPlayer == CheckersData.RED)
-//	                  message.setText("RED:  Make your move.");
-//	               else
-//	                  message.setText("BLACK:  Make your move.");
+	               if (currentPlayer == CheckersData.RED)
+	                  message.setText("RED:  Make your move.");
+	               else
+	                  message.setText("BLACK:  Make your move.");
 	               repaint();
 	               return;
 	            }
@@ -315,7 +289,7 @@ import java.util.Queue;
 	    //	 System.out.println("CM : " + currentMove.toString()); 
 
 	         board.makeMove(move);
-	         message.setText(move.toString());
+	         
 	         /* If the move was a jump, it's possible that the player has another
 	          jump.  Check for legal jumps starting from the square that the player
 	          just moved to.  If there are any, the player must jump.  The same
@@ -325,10 +299,10 @@ import java.util.Queue;
 	         if (move.isJump()) {
 	            legalMoves = board.getLegalJumpsFrom(currentPlayer,move.toRow,move.toCol);
 	            if (legalMoves != null) {
-	             //  if (currentPlayer == CheckersData.RED)
-	               //   message.setText("RED:  You must continue jumping.");
-	               //else
-	               //   message.setText("BLACK:  You must continue jumping.");
+	               if (currentPlayer == CheckersData.RED)
+	                  message.setText("RED:  You must continue jumping.");
+	               else
+	                  message.setText("BLACK:  You must continue jumping.");
 	               selectedRow = move.toRow;  // Since only one piece can be moved, select it.
 	               selectedCol = move.toCol;
 	               repaint();
@@ -343,22 +317,34 @@ import java.util.Queue;
 	         if (currentPlayer == CheckersData.RED) {
 	            currentPlayer = CheckersData.BLACK;
 	            legalMoves = board.getLegalMoves(currentPlayer);
-	            if (legalMoves == null)
+	            if (legalMoves == null){
+	            	winner = 1;
 	               gameOver("BLACK has no moves.  RED wins.");
-//	            else if (legalMoves[0].isJump())
-//	               message.setText("BLACK:  Make your move.  You must jump.");
-//	            else
-//	               message.setText("BLACK:  Make your move.");
+	            }
+	            else if(currentPlayer == player){ 
+	            	if (legalMoves[0].isJump())
+	            		message.setText("BLACK:  Make your move.  You must jump.");
+	            	else
+	            		message.setText("BLACK:  Make your move.");
+	            }
+	            else
+	            	message.setText("Waiting on move from BLACK");
 	         }
 	         else {
 	            currentPlayer = CheckersData.RED;
 	            legalMoves = board.getLegalMoves(currentPlayer);
-	            if (legalMoves == null)
-	               gameOver("RED has no moves.  BLACK wins.");
-//	            else if (legalMoves[0].isJump())
-//	               message.setText("RED:  Make your move.  You must jump.");
-//	            else
-//	               message.setText("RED:  Make your move.");
+	            if (legalMoves == null){
+	            	winner = 3;
+	               gameOver("RED has no moves.  BLACK wins.");  
+	            }
+	            else if(currentPlayer == player){ 
+	            	if (legalMoves[0].isJump())
+	            		message.setText("RED:  Make your move.  You must jump.");
+	            	else
+	            		message.setText("RED:  Make your move.");
+	            }
+	            else
+	            	message.setText("Waiting on move from RED");
 	         }
 	         
 	         /* Set selectedRow = -1 to record that the player has not yet selected
@@ -441,7 +427,7 @@ import java.util.Queue;
 	         /* If a game is in progress, hilite the legal moves.   Note that legalMoves
 	          is never null while a game is in progress. */      
 	         
-	         if (gameInProgress) {
+	         if (gameInProgress && currentPlayer == player) {
 	               /* First, draw a 2-pixel cyan border around the pieces that can be moved. */
 	            g.setColor(Color.cyan);
 	            for (int i = 0; i < legalMoves.length; i++) {
@@ -492,6 +478,12 @@ import java.util.Queue;
 	      public void mouseClicked(MouseEvent evt) { }
 	      public void mouseEntered(MouseEvent evt) { }
 	      public void mouseExited(MouseEvent evt) { }
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
 	      
 	      
 	   }  // end class Board

@@ -8,7 +8,6 @@ public class ChatClient implements Runnable
    private DataInputStream  console   = null;
    private DataOutputStream streamOut = null;
    private ChatClientThread client    = null;
-   String name = null;
    Game g = null;
    boolean playing;
    int number;
@@ -67,12 +66,6 @@ public class ChatClient implements Runnable
       client.stop();
    }
    
-   public void setName(String name){
-	   this.name = name;
-   }
-   public String returnName(){
-	   return name;
-   }
    //Get output 
    public DataOutputStream getOuptuStream(){
 	   return streamOut;
@@ -115,62 +108,60 @@ public class ChatClient implements Runnable
 		   System.out.println("Good bye. Press RETURN to exit ...");
         	stop();
 		}
+	   else if (msg.equals("GAME ENDED")){
+		   this.playing = false;
+	   }
 	   else if(msg.equals("play 1")){
 		   startGameP1();
 	   }
 	   else if(msg.equals("play 2")){
-		  System.out.println("PLAY2 STARTED");
+		  //System.out.println("PLAY2 STARTED");
 		   startGameP2();
 		   
-			
 		   
 	   }
 	   
 	   //When the player receives a move and should make the move and then get the players next move
-	   else if(msg.substring(0, 6).equals("MOVE: ")){
+	   else if(msg.startsWith("MOVE: ")){
 		   CheckersMove m  = g.createMove(msg);
 		   g.makeMove(m);
-			  if(g.c.board.currentPlayer == number){  // THIS IS WHERE THE PROBLEM IS GET IT TO CONTINUE TO READ IF STILL TURN
-			
+	       win();
+		   if(g.c.board.currentPlayer == number){ 
 				   getMove();
-				
+				   
 			   }
-			  
-			  if(g.c.board.gameInProgress == true){
-				  while(g.c.board.currentPlayer == number){  
-					
-					  getMove();
+			  while(g.c.board.currentPlayer == number){  
+      			  getMove();
 			   }
-			  }
-			  else{
-				  String w;
-				  if(g.getPlayer() == g.getWinner()){
-					  w= "WINNER";
-					  
-				  }
-				  else{
-					  w = "LOSER";
-				  }
-					  try {
-						this.getOuptuStream().writeUTF(w);
-						this.getOuptuStream().flush();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					  
-			  }
-			
-		   }
-     else
+	   }
+     else{
         System.out.println(msg);
+	   
+     }
   }	
-   
+   private void win(){
+	   if(g.getWinner() != 0){
+		   g.delete();
+	   if(g.getWinner() != number){
+		   System.out.println("Sorry you lose.");
+		   this.playing = false;
+		   try {
+				this.getOuptuStream().writeUTF("GAME ENDED");
+				this.getOuptuStream().flush();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	   }
+	   else
+		   System.out.println("You win!");
+	   }
+   }
    //Get the players turn and write it to the output and send it to the other player
    public void getMove(){
 	   CheckersMove m = null;
 	   String x = "";
-	   while (g.getMove() == null){
+	   while ((m = g.getMove()) == null){
 		   System.out.print("");
 		   m = g.getMove();
 		   if(m != null){
@@ -180,19 +171,25 @@ public class ChatClient implements Runnable
 		   }
 		 
 	 }
-	   System.out.println("THIS IS SIZE: " + g.moveN());
+	   if(x.trim().length() == 0){
+		  getMove();
+	   }
+	   /*System.out.println("THIS IS SIZE: " + g.moveN());
 	   if(g.c.board.moves.size() > 0){
 		   System.out.println("WORKS");
-	   }
+	   }*/
 
 	   System.out.println(x);
 		   try {
+			   if(x != ""){
 				this.getOuptuStream().writeUTF(x);
 				this.getOuptuStream().flush();
+			   }
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		   win();
 		   
 	   }
 	  

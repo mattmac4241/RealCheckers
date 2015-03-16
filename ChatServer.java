@@ -9,7 +9,9 @@ public class ChatServer implements Runnable{
 	private Thread thread = null;
 	private int clientCount = 0;
 	private int openClients = 0;
-	private HashMap names = new HashMap();
+	private HashMap<String, ChatServerThread> names = new HashMap<String, ChatServerThread>();
+	private permDB go = new permDB();
+	
 
 	public ChatServer(int port){
 	   try{
@@ -49,69 +51,114 @@ public class ChatServer implements Runnable{
 		   thread = null;
 	   } 
    }
+   
    private int findClient(int ID)
    {  for (int i = 0; i < clientCount; i++)
          if (clients[i].getID() == ID)
             return i;
       return -1;
    }
+   
    public synchronized void handle(int ID, String input){
-	   try{
-	   System.out.println("RECIEVED: " + input);
 	   ChatServerThread client = clients[findClient(ID)];
-
 	   int opponent = client.opponentID;
+ 		if (input.equals("list")) {
+		   playersRanked(client);
+	   }
 	   if (input.equals(".bye")){
+		   if(client.user != null)
+			   openClients--;
 		   client.send(".bye");
 		   if(opponent != -1){
 			   clients[findClient(opponent)].send("Game Ended");
 			   clients[findClient(opponent)].opponentID = -1;
+			   openClients++;
+		   }
+		   if(client.username != null && client.username.startsWith("Guest")){
+
+			   names.remove(client.username);
+		   }
+		   else{
+			   names.put(client.username, null);
 		   }
 		   remove(ID); 
        }
+	   
 	   else if(client.username == null){
 		   setName(input, client);
 	   }
-      else{
+	   
+	   else if(!names.containsKey(client.username) || names.get(client.username) == null){
+		   validateUser(input, client);
+	   }
+	   
+       else{
     	  if((opponent) != -1){
 			  respondOpponent(input, client);
     	  }
-    	  else if(input.substring(0, 6).equals("MOVE: ") & input.length() > 9){
-    		   System.out.println("SENT: " + input);
-    		   ChatServerThread op = clients[findClient(client.opponentID)];
-				op.send(input);
-			}
-    	  
     	  else{
-    		  findOpponent(input, client);
+    			  findOpponent(input, client);
+    		  
     	  }
       }
-	   }
-	   catch(IndexOutOfBoundsException e){
-		   
-	   }
-	   
    }
    
    private void setName(String input, ChatServerThread client){
 	   String name = input.trim();
-	   if(!name.equals("") && !names.containsKey(name)){
+	   if(!name.equals("") && !go.userExists(name) /*!names.containsKey(name)*/){
 		   client.username = name;
-		   names.put(name, client);
-		   client.send("Name set to " + name);
-		   openClients++;
-		   showOpponents(client);
+		   client.send("Name not found. Enter a password to create user " + name + " or enter 'N' to pick a different name:");
 	   }
-	   else if(names.containsKey(name)){
-		   client.send("Name is already taken");
+	   else if( go.userExists(name) /*names.containsKey(name)*/){
+		  
+		   if( names.get(name) != null )
+			   client.send("Name is already taken");
+		   else{
+			   client.username = name;
+			   client.send("Please enter password:");
+		   }
 	   }
 	   else{
 		   name = "Guest" + client.getID();
 		   client.username = name;
 		   names.put(name, client);
 		   client.send("Name set to " + name);
+		   client.user = new User();
 		   openClients++;
 		   showOpponents(client);
+	   }
+   }
+   
+   private void validateUser(String input, ChatServerThread client){
+/*	   if(input.toUpperCase().equals("Y")){
+		   client.send("Please create password:");
+	   } */
+	   if(input.toUpperCase().equals("N")){
+		   client.username = null;
+		   client.send("Please enter your name:");
+	   }
+	   else if(!go.userExists(client.username) /*names.containsKey(client.username)*/ && !input.trim().equals("")){
+		   client.user = new User();
+		   client.user.setID(client.getID());
+		   client.user.setName(client.username);
+		   client.user.setPassword(input.trim());
+		   names.put(client.username, client);
+		   go.update(client.user, false);
+		   openClients++;
+		   client.send("User " + client.username + " created.");
+		   showOpponents(client);
+	   }
+	
+	   //we need to add code here that checks if the password matches user
+	   else if((client.user = go.pwMatch(client.username, input)) != null){
+		   client.send("Login successful");
+		   client.user.setID(client.getID());
+		   names.put(client.username, client);
+		   openClients++;
+		   showOpponents(client);
+	   }
+	   else{
+		   client.send("Password invalid. Retry or type 'N' to give a different name:");
 	   }
    }
    
@@ -121,8 +168,8 @@ public class ChatServer implements Runnable{
 		   client.send("Available opponents:");
 		   for (int i = 0; i < clientCount; i++){
 			   ChatServerThread temp = clients[i];
-			   if(i != thisClient && temp.opponentID == -1 && temp.username != null)
-				   client.send(temp.username);
+			   if(i != thisClient && temp.opponentID == -1 && temp.user != null)
+				   client.send(temp.username + " W: " + temp.user.getWins() + " L: " + temp.user.getLosses());
 		   }
 		   client.send("Enter an opponent's name to challenge or hit enter to refresh");
 	   }
@@ -131,10 +178,27 @@ public class ChatServer implements Runnable{
 	   }
    }
    
+   private void playersRanked(ChatServerThread client){
+	   int thisClient = findClient(client.getID());
+	   client.send("List of players and records: ");
+	   for (int i = 0; i < clientCount; i++) {
+		   client.send("Got this far");
+		   ChatServerThread temp = clients[i];
+		   if (temp.user != null) {
+			   client.send("Got this far 2");
+			   double wrec = 0;
+			   if ((temp.user.getWins() + temp.user.getLosses()) > 0){
+				   wrec = (temp.user.getWins() * 100 / (temp.user.getWins() + temp.user.getLosses())); 
+			   }
+			   client.send(temp.username + " Weighted Record: " + wrec);
+		   }
+	   }
+   }
+   
    private void findOpponent(String input, ChatServerThread client){
 	   if(openClients > 1){
 		   int ID = client.getID();
-		   if(!input.equals(client.username) && names.containsKey(input)){
+		   if(!input.equals(client.username) && names.get(input) != null){
 			   ChatServerThread op = (ChatServerThread) names.get(input);
 			   if(op.opponentID == -1){
 				   op.send(client.username + " is challenging you to a game. Do you want to play? Y/N");
@@ -159,13 +223,16 @@ public class ChatServer implements Runnable{
 	   ChatServerThread op = clients[findClient(client.opponentID)];
 		  if(input.toUpperCase().equals("Y") && op.opponentID == -2){
 			  op.opponentID = client.getID();
+			  op.user.conenctTo(client.getID());
+			  client.user.conenctTo(client.opponentID);
 			  op.send("Game Accepted");
 			  client.send("Game Accepted");
 			  client.send("play 1");
 			  op.send("play 2");
 		  }
-		  else if(input.toUpperCase().equals("N") ){
+		  else if(input.toUpperCase().equals("N") && op.opponentID == -2){
 			  client.opponentID = -1;
+			  op.opponentID = -1;
 			  op.send("Game Rejected");
 			  client.send("Game Rejected");
 			  openClients = openClients + 2;
@@ -173,17 +240,26 @@ public class ChatServer implements Runnable{
 		  else if (op.opponentID == -2){
 			  client.send("Please respond 'Y' or 'N'");
 		  }
-		  
-		  else if(input.substring(0, 6).equals("MOVE: ") & input.length() > 9){
-   		      System.out.println("SENT: " + input);
-
-   		        op = clients[findClient(client.opponentID)];
-				op.send(input);
-			}
-		  
-		  
-		  else{
-   		      System.out.println("SENT: " + input);
+		  else if(input.startsWith("MOVE: ") & input.length() > 9){
+			  op.send(input);
+			  System.out.println(input);
+		  }
+		  else if(input.equals("GAME ENDED")){
+			  client.user.loss();
+			  op.user.won();
+			  System.out.println(op.username);
+			  op.send("GAME ENDED");
+			  op.send("You win!");
+			  op.send("Your record is now " + op.user.getWins() + " wins and " 
+					  + op.user.getLosses() + " losses.");
+			  client.send("Your record is now " + client.user.getWins() + " wins and " 
+					  + client.user.getLosses() + " losses.");
+			  client.opponentID = -1;
+			  op.opponentID = -1;
+			  openClients += 2;  
+			  showOpponents(client);
+		  }
+		  else if(input.trim().length() != 0){
 			  op.send(input);
 		  }
    }
@@ -193,7 +269,7 @@ public class ChatServer implements Runnable{
 	   if (pos >= 0){
 		   ChatServerThread toTerminate = clients[pos];
 		   System.out.println("Removing client thread " + ID + " at " + pos);
-		   names.remove(toTerminate.username);
+		   //names.remove(toTerminate.username);
 		   if (pos < clientCount-1)
 			   for (int i = pos+1; i < clientCount; i++)
 				   clients[i-1] = clients[i];

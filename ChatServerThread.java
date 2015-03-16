@@ -33,16 +33,6 @@ public class ChatServerThread extends Thread{
        }
    }
    
-   public void setUsername(String name){
-	   username = name;
-   }
-   
-   public String getUserName(){
-	   return username;
-   }
-   
-   
-   
    public int getID(){
 	   return ID;
    }
@@ -52,7 +42,7 @@ public class ChatServerThread extends Thread{
 	   send("\n-----------------------------");
 	   send("Welcome to the King Me Server");
 	   send("-----------------------------");
-	 
+	   send("\nPlease enter your name or press enter for an assigned name:");
 	   while (running){
 		   try{
 			   server.handle(ID, streamIn.readUTF());
